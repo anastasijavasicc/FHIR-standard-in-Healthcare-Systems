@@ -32,6 +32,8 @@ docker compose up -d
 # Verify:
 # open http://localhost:8080/fhir/metadata
 
+---
+
 ### 2) Import the Postman collection
 - Import `postman_collection.json` into Postman.
 - In the collection **Variables**, ensure:
@@ -50,7 +52,6 @@ docker compose up -d
    - Uses variables `patientId`, `obsHemoglobinId`, `obsGlucoseId`.
 6. **Search DiagnosticReports – by Patient**
 
----
 
 ## 🧩 Project contents
 
