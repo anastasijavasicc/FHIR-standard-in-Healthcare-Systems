@@ -1,0 +1,246 @@
+{
+  "info": {
+    "name": "FHIR Easy Project – Patient & Lab Observations",
+    "_postman_id": "b2222222-c333-4ddd-9eee-ffff0000aaaa",
+    "description": "Create Patient, create Observations, and search them on a local HAPI FHIR server.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get CapabilityStatement",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/metadata",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "metadata"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Patient",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "  const loc = pm.response.headers.get('Location') || '';",
+              "  const m = loc.match(/Patient\\/([^/]+)/);",
+              "  if (m) { pm.collectionVariables.set('patientId', m[1]); }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Patient\",\n  \"identifier\": [\n    {\n      \"use\": \"official\",\n      \"system\": \"http://hospital.rs/mrn\",\n      \"value\": \"MRN-000123\"\n    }\n  ],\n  \"name\": [\n    {\n      \"family\": \"Petrović\",\n      \"given\": [\n        \"Ana\"\n      ]\n    }\n  ],\n  \"gender\": \"female\",\n  \"birthDate\": \"1990-05-12\",\n  \"address\": [\n    {\n      \"text\": \"Beograd, Srbija\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/Patient",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "Patient"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Search Patient by MRN",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/Patient?identifier=http://hospital.rs/mrn|MRN-000123",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "Patient"
+          ],
+          "query": [
+            {
+              "key": "identifier",
+              "value": "http://hospital.rs/mrn|MRN-000123"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Observation – Hemoglobin",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Observation\",\n  \"status\": \"final\",\n  \"category\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://terminology.hl7.org/CodeSystem/observation-category\",\n          \"code\": \"laboratory\"\n        }\n      ]\n    }\n  ],\n  \"code\": {\n    \"coding\": [\n      {\n        \"system\": \"http://loinc.org\",\n        \"code\": \"718-7\",\n        \"display\": \"Hemoglobin [Mass/volume] in Blood\"\n      }\n    ]\n  },\n  \"subject\": {\n    \"reference\": \"Patient/{{patientId}}\"\n  },\n  \"effectiveDateTime\": \"2025-03-01T09:30:00+01:00\",\n  \"valueQuantity\": {\n    \"value\": 135,\n    \"unit\": \"g/L\"\n  },\n  \"referenceRange\": [\n    {\n      \"low\": {\n        \"value\": 120,\n        \"unit\": \"g/L\"\n      },\n      \"high\": {\n        \"value\": 160,\n        \"unit\": \"g/L\"\n      }\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/Observation",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "Observation"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Observation – Glucose",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Observation\",\n  \"status\": \"final\",\n  \"category\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://terminology.hl7.org/CodeSystem/observation-category\",\n          \"code\": \"laboratory\"\n        }\n      ]\n    }\n  ],\n  \"code\": {\n    \"coding\": [\n      {\n        \"system\": \"http://loinc.org\",\n        \"code\": \"2345-7\",\n        \"display\": \"Glucose [Mass/volume] in Serum or Plasma\"\n      }\n    ]\n  },\n  \"subject\": {\n    \"reference\": \"Patient/{{patientId}}\"\n  },\n  \"effectiveDateTime\": \"2025-03-01T09:45:00+01:00\",\n  \"valueQuantity\": {\n    \"value\": 5.1,\n    \"unit\": \"mmol/L\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/Observation",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "Observation"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Search Observations – All for Patient",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/Observation?patient=Patient/{{patientId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "Observation"
+          ],
+          "query": [
+            {
+              "key": "patient",
+              "value": "Patient/{{patientId}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Search Observations – Hemoglobin only",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/Observation?patient=Patient/{{patientId}}&code=loinc|718-7",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "Observation"
+          ],
+          "query": [
+            {
+              "key": "patient",
+              "value": "Patient/{{patientId}}"
+            },
+            {
+              "key": "code",
+              "value": "loinc|718-7"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create DiagnosticReport (links Hemo+Glucose)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"DiagnosticReport\",\n  \"status\": \"final\",\n  \"category\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0074\",\n          \"code\": \"LAB\",\n          \"display\": \"Laboratory\"\n        }\n      ]\n    }\n  ],\n  \"code\": {\n    \"coding\": [\n      {\n        \"system\": \"http://loinc.org\",\n        \"code\": \"11502-2\",\n        \"display\": \"Laboratory report\"\n      }\n    ]\n  },\n  \"subject\": {\n    \"reference\": \"Patient/{{patientId}}\"\n  },\n  \"effectiveDateTime\": \"2025-03-01T10:00:00+01:00\",\n  \"issued\": \"2025-03-01T10:05:00+01:00\",\n  \"result\": [\n    {\n      \"reference\": \"Observation/{{obsHemoglobinId}}\"\n    },\n    {\n      \"reference\": \"Observation/{{obsGlucoseId}}\"\n    }\n  ],\n  \"conclusion\": \"Findings: Hemoglobin and glucose within expected ranges for adult female.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/DiagnosticReport",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "DiagnosticReport"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Search DiagnosticReports – by Patient",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/DiagnosticReport?patient=Patient/{{patientId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "DiagnosticReport"
+          ],
+          "query": [
+            {
+              "key": "patient",
+              "value": "Patient/{{patientId}}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/fhir"
+    },
+    {
+      "key": "patientId",
+      "value": ""
+    },
+    {
+      "key": "obsHemoglobinId",
+      "value": ""
+    },
+    {
+      "key": "obsGlucoseId",
+      "value": ""
+    }
+  ]
+}
