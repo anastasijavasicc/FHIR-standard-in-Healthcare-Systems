@@ -1,7 +1,5 @@
 # FHIR-standard-in-Healthcare-Systems
 
-# FHIR Easy Project – Interoperability Demo
-
 Minimal FHIR (R4) demo for the course *Interoperability and Information Integration*:
 - `Patient`
 - Two lab `Observation`s:
