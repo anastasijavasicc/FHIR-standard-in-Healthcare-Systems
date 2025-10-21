@@ -117,9 +117,6 @@ curl -s "http://localhost:8080/fhir/Observation?patient=Patient/<ID>&code=loinc|
 
 ---
 
-## 📄 License
-
-MIT (recommended) — add a `LICENSE` file if making the repo public.
 
 ---
 
