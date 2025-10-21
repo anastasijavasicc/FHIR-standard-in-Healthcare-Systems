@@ -89,7 +89,7 @@ curl -s "http://localhost:8080/fhir/Observation?patient=Patient/<ID>&code=loinc|
 
 ---
 
-## 🩺 Domain notes (for presentation)
+## 🩺 Domain notes 
 
 - **MRN (Medical Record Number):** local hospital identifier stored in `Patient.identifier`.
 - **Observation:** a single measurement/finding (e.g., a lab value).  
